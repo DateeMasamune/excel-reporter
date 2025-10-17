@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: ".env.development" });
 
-console.log("=========>process.env", process.env.NODE_ENV);
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,
