@@ -1,19 +1,17 @@
+import type { TMenuItem, TMenuList } from "@/entities/menu-list";
 import { useState } from "react";
 
 export const useChecked = () => {
-  const [checked, setChecked] = useState([0]);
+  const [checked, setChecked] = useState<TMenuList>([]);
 
-  const handleToggle = (value: number) => () => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
+  const handleToggle = (menuItem: TMenuItem) => () => {
+    const findMenuItem = checked.find(({ id }) => id === menuItem.id);
 
-    if (currentIndex === -1) {
-      newChecked.push(value);
-    } else {
-      newChecked.splice(currentIndex, 1);
+    if (findMenuItem) {
+      return setChecked([...checked.filter(({ id }) => id !== menuItem.id)]);
     }
 
-    setChecked(newChecked);
+    return setChecked((prev) => [...prev, menuItem]);
   };
 
   return {
