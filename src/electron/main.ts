@@ -1,15 +1,18 @@
-import { app, BrowserWindow } from "electron/main";
+import { app, BrowserWindow, ipcMain } from "electron";
 import path from "node:path";
 import dotenv from "dotenv";
+import { generateExcel } from "./excel-reporter";
 
 dotenv.config({ path: ".env.development" });
+
+ipcMain.handle("generate-excel", generateExcel);
 
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(import.meta.dirname, "preload.js"),
+      preload: path.join(__dirname, "preload.js"),
     },
   });
 
