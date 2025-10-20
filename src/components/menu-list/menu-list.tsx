@@ -8,13 +8,13 @@ import {
   Button,
   List,
   Grid,
+  debounce,
 } from "@mui/material";
 import { ListSubheaderStyled, MenuStyled } from "./styled";
 import { sortListAsc } from "./utils/sort-list-asc";
 import { groupAlphabet } from "./utils/group-alphabet";
 import { useState } from "react";
 import type { TMenuList } from "@/entities/menu-list";
-import debounce from "debounce";
 import { SearchInput } from "@components/search-input";
 import { ModifyDish } from "@components/modify-dish";
 
