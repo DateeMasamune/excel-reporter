@@ -1,4 +1,4 @@
-import { Modal, type TModal } from "@components/modal";
+import { Modal, type TModal } from "@renderer/components/modal";
 import { Typography } from "@mui/material";
 
 type Props = Omit<TModal, "title">;

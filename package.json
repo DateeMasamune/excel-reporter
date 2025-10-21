@@ -3,29 +3,28 @@
   "version": "0.0.1",
   "author": "Dmitry Ovsienko",
   "description": "excel reporter",
-  "main": "main.ts",
-  "type": "module",
+  "main": "out/main/index.js",
   "scripts": {
-    "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "electron-forge start",
     "package": "electron-forge package",
-    "make": "electron-forge make"
+    "make": "electron-forge make",
+    "start": "electron-vite preview",
+    "dev": "electron-vite dev",
+    "prebuild": "electron-vite build"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
-    "@fontsource/roboto": "5.2.8",
     "@mui/icons-material": "7.3.4",
     "@mui/material": "7.3.4",
-    "dotenv": "17.2.3",
     "electron-squirrel-startup": "1.0.1",
     "react": "19.1.1",
     "react-dom": "19.1.1"
   },
   "devDependencies": {
+    "electron-vite": "4.0.1",
     "@electron-forge/cli": "7.8.3",
     "@electron-forge/maker-deb": "7.10.2",
     "@electron-forge/maker-rpm": "7.10.2",

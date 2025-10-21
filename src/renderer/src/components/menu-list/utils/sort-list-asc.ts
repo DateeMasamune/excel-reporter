@@ -1,4 +1,4 @@
-import type { TMenuList } from "@/entities/menu-list";
+import type { TMenuList } from "@renderer/entities/menu-list";
 
 export const sortListAsc = (menu: TMenuList) =>
   menu.sort((a, b) =>

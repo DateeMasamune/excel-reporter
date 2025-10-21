@@ -1,4 +1,4 @@
-import { useSearchValue } from "@/shared/hooks/use-search-value";
+import { useSearchValue } from "@renderer/shared/hooks/use-search-value";
 import { TextFieldStyled } from "./styled";
 import { InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";

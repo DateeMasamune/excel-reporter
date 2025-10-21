@@ -1,7 +1,7 @@
 import { Grid, IconButton, Menu, MenuItem, Button } from "@mui/material";
 import type { ReactElement } from "react";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { useAnchourElement } from "@/shared/hooks/use-anchor-element";
+import { useAnchourElement } from "@renderer/shared/hooks/use-anchor-element";
 
 type Props = {
   icon?: ReactElement;

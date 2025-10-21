@@ -1,4 +1,4 @@
-import type { TMenuItem, TMenuList } from "@/entities/menu-list";
+import type { TMenuItem, TMenuList } from "@renderer/entities/menu-list";
 import { useState } from "react";
 
 export const useChecked = () => {

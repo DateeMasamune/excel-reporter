@@ -1,22 +1,21 @@
-import { app, BrowserWindow } from "electron/main";
-import path from "node:path";
-import dotenv from "dotenv";
+import { app, BrowserWindow, ipcMain } from "electron";
+import path, { join } from "path";
 
-dotenv.config({ path: ".env.development" });
+ipcMain.handle("ping", () => "pong");
 
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(import.meta.dirname, "preload.js"),
+      preload: path.join(import.meta.dirname, "../../out/preload/index.js"),
     },
   });
 
-  if (process.env.NODE_ENV === "development") {
-    win.loadURL(`http://localhost:${process.env.PORT}`);
+  if (import.meta.env.DEV) {
+    win.loadURL(`http://localhost:${import.meta.env.VITE_PORT}`);
   } else {
-    win.loadFile("index.html");
+    win.loadFile(join(__dirname, "../renderer/index.html"));
   }
 }
 
