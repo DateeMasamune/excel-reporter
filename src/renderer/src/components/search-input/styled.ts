@@ -1,4 +1,4 @@
-import { CSS_PROPS } from "@/constants/global-css";
+import { CSS_PROPS } from "@renderer/constants/global-css";
 import styled from "@emotion/styled";
 import { TextField } from "@mui/material";
 

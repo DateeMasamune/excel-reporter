@@ -25,12 +25,7 @@
     "noUncheckedSideEffectImports": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@components/*": ["./src/components/*"],
-      "@utils/*": ["./src/shared/utils/*"],
-      "@hooks/*": ["./src/shared/hooks/*"],
-      "@theme/*": ["./src/theme/*"],
-      "@constants/*": ["./src/constants/*"]
+      "@renderer/*": ["src/renderer/src/*"]
     }
   },
   "include": ["src"]

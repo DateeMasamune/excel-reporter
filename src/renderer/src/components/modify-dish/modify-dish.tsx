@@ -1,9 +1,9 @@
 import { Grid } from "@mui/material";
-import { ModalDelete } from "@components/modal-delete";
-import { useModal } from "@/shared/hooks/use-modal";
-import { SettingsButton } from "@components/settings-button";
-import { DishModal as ChangeDishModal } from "@components/dish-modal";
-import type { TMenuItem } from "@/entities/menu-list";
+import { ModalDelete } from "@renderer/components/modal-delete";
+import { useModal } from "@renderer/shared/hooks/use-modal";
+import { SettingsButton } from "@renderer/components/settings-button";
+import { DishModal as ChangeDishModal } from "@renderer/components/dish-modal";
+import type { TMenuItem } from "@renderer/entities/menu-list";
 
 type Props = {
   dish: TMenuItem;

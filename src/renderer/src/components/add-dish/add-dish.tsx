@@ -1,7 +1,7 @@
 import { Button } from "@mui/material";
-import { useModal } from "@/shared/hooks/use-modal";
-import type { TMenuItem } from "@/entities/menu-list";
-import { DishModal } from "@components/dish-modal";
+import { useModal } from "@renderer/shared/hooks/use-modal";
+import type { TMenuItem } from "@renderer/entities/menu-list";
+import { DishModal } from "@renderer/components/dish-modal";
 
 export const AddDish = () => {
   const { open, handleClose, handleOpen } = useModal();

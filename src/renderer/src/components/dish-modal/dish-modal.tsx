@@ -1,8 +1,8 @@
-import { FIELD_NAMES } from "@/constants/field-names";
-import type { TMenuItem } from "@/entities/menu-list";
+import { FIELD_NAMES } from "@renderer/constants/field-names";
+import type { TMenuItem } from "@renderer/entities/menu-list";
 import { Grid, TextField } from "@mui/material";
 import { useState } from "react";
-import { Modal, type TModal } from "@components/modal";
+import { Modal, type TModal } from "@renderer/components/modal";
 
 type Props = Omit<TModal, "handleApply"> & {
   dish?: TMenuItem;

@@ -1,5 +1,5 @@
-import { useAnchourElement } from "@/shared/hooks/use-anchor-element";
-import { useChecked } from "@/shared/hooks/use-checked";
+import { useAnchourElement } from "@renderer/shared/hooks/use-anchor-element";
+import { useChecked } from "@renderer/shared/hooks/use-checked";
 import {
   ListItemText,
   Checkbox,
@@ -8,15 +8,15 @@ import {
   Button,
   List,
   Grid,
+  debounce,
 } from "@mui/material";
 import { ListSubheaderStyled, MenuStyled } from "./styled";
 import { sortListAsc } from "./utils/sort-list-asc";
 import { groupAlphabet } from "./utils/group-alphabet";
 import { useState } from "react";
-import type { TMenuList } from "@/entities/menu-list";
-import debounce from "debounce";
-import { SearchInput } from "@components/search-input";
-import { ModifyDish } from "@components/modify-dish";
+import type { TMenuList } from "@renderer/entities/menu-list";
+import { SearchInput } from "@renderer/components/search-input";
+import { ModifyDish } from "@renderer/components/modify-dish";
 
 const mock = [
   {
