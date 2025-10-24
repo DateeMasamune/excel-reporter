@@ -5,178 +5,13 @@ import { applyTableStyles } from "./applyTableStyles";
 import { applyBlankStructure } from "./applyBlankStructure";
 import { getLogoAsArrayBuffer } from "./getLogoAsArrayBuffer";
 import { logger } from "../logger";
-
-const pixToPoint = (height: number) => height * 0.75;
+import { getBlankStructure } from "./getBlankStructure";
+import { COLUMN_WIDTH } from "../constants";
 
 const calcWidthCol = (originalPixels: number[]) =>
   originalPixels.map((pixels) => ({
     width: Math.round(Math.max(1, pixels / 7.5)), // 7.5 - среднее значение
   }));
-
-const columnWidths = [304, 103, 83, 92, 133];
-
-// Конфигурация высот строк
-export const ROW_HEIGHTS = {
-  LOGO: pixToPoint(228), // Строка с логотипом
-  EMPTY: 5, // Пустые строки
-  INFO: pixToPoint(33), // Информационные строки
-  SUMMARY: 25, // Строки с суммами
-  TABLE_HEADER: pixToPoint(40), // Заголовок таблицы
-  TABLE_ROW: pixToPoint(40), // Строки таблицы
-  LEGAL_TEXT: pixToPoint(64), // Юридический текст
-  SIGNATURE: pixToPoint(54), // Строка с подписями
-};
-
-// Конфигурация таблицы
-export const TABLE_CONFIG = {
-  START_ROW: 10,
-  TOTAL_ROWS: 14,
-  COLUMNS: ["Позиция", "Стоимость", "Кол-во", "Сумма", "Комментарий к подаче"],
-};
-
-const BASE_FONT = {
-  name: "Times New Roman",
-};
-
-const CELL_STYLES = {
-  BOLD_12: { bold: true, size: 12, ...BASE_FONT },
-  NOT_BOLD_12: { size: 12, ...BASE_FONT },
-  BOLD: { bold: true, ...BASE_FONT },
-  ITALIC: { italic: true, ...BASE_FONT },
-  WRAP_TEXT: { wrapText: true },
-  SIZE_10: { size: 10, ...BASE_FONT },
-};
-
-// Вспомогательные функции
-const formula = (expr: string) => ({ formula: expr });
-
-// Определение структуры бланка с высотами
-export const BLANK_STRUCTURE = [
-  // Строка 1: Логотип (обрабатывается отдельно)
-  { data: [""], height: ROW_HEIGHTS.LOGO },
-
-  // Информационный блок (строки 3-8)
-  {
-    data: ["Ресторан: Токио-Сити"],
-    height: ROW_HEIGHTS.INFO,
-    style: CELL_STYLES.BOLD_12,
-  },
-  {
-    data: ["Дата и время мероприятия:"],
-    height: ROW_HEIGHTS.INFO,
-    style: CELL_STYLES.BOLD_12,
-  },
-  {
-    data: ["Имя контактного лица:"],
-    height: ROW_HEIGHTS.INFO,
-    style: CELL_STYLES.BOLD_12,
-  },
-  { data: ["Телефон:"], height: ROW_HEIGHTS.INFO, style: CELL_STYLES.BOLD_12 },
-  {
-    data: ["Кол-во персон:"],
-    height: ROW_HEIGHTS.INFO,
-    style: CELL_STYLES.BOLD_12,
-  },
-  {
-    data: ["П/З принял (сотрудник):"],
-    height: ROW_HEIGHTS.INFO,
-    style: CELL_STYLES.BOLD_12,
-  },
-
-  // Строка 9: Сумма
-  {
-    data: [
-      "Сумма:",
-      "",
-      "",
-      "",
-      formula(`SUM(E${TABLE_CONFIG.START_ROW + TABLE_CONFIG.TOTAL_ROWS + 1})`),
-    ],
-    height: ROW_HEIGHTS.INFO,
-    style: CELL_STYLES.BOLD_12,
-  },
-
-  // Строка 10: Заголовок таблицы
-  {
-    data: TABLE_CONFIG.COLUMNS,
-    height: ROW_HEIGHTS.TABLE_HEADER,
-    isHeader: true,
-    style: CELL_STYLES.BOLD_12,
-  },
-
-  // Строки 11-24: Данные таблицы (14 строк)
-  ...Array(TABLE_CONFIG.TOTAL_ROWS)
-    .fill(null)
-    .map((_, index) => ({
-      data: [
-        "",
-        0,
-        1,
-        formula(
-          `B${TABLE_CONFIG.START_ROW + index}*C${TABLE_CONFIG.START_ROW + index}`
-        ),
-        "",
-      ],
-      height: ROW_HEIGHTS.TABLE_ROW,
-      style: CELL_STYLES.NOT_BOLD_12,
-    })),
-
-  // Строка 25: Итого сумма по меню
-  {
-    data: [
-      "Итого сумма по меню:",
-      "",
-      "",
-      "",
-      formula(
-        `SUM(D${TABLE_CONFIG.START_ROW}:D${TABLE_CONFIG.START_ROW + TABLE_CONFIG.TOTAL_ROWS - 1})`
-      ),
-    ],
-    height: ROW_HEIGHTS.SUMMARY,
-    style: CELL_STYLES.BOLD_12,
-  },
-
-  // Строка 26: ИТОГО
-  {
-    data: [
-      "ИТОГО:",
-      "",
-      "",
-      "",
-      formula(`SUM(E${TABLE_CONFIG.START_ROW + TABLE_CONFIG.TOTAL_ROWS})`),
-    ],
-    height: ROW_HEIGHTS.SUMMARY,
-    style: CELL_STYLES.BOLD_12,
-  },
-
-  // Строка 27: Дата составления
-  {
-    data: ["Дата составления:", "", "", "", formula("TODAY()")],
-    height: ROW_HEIGHTS.INFO,
-    style: CELL_STYLES.BOLD_12,
-  },
-
-  // Строка 28: Юридический текст
-  {
-    data: [
-      "* В связи с вступлением в силу закона п.19 Постановление Правительства РФ от 21.09.2020 №1515 «Об утверждении Правил оказания услуг общественного питания» с 01.01.2021. подтверждаю, что ознакомлен и согласен с порядком и стоимостью организации досуга в ресторане*",
-    ],
-    height: ROW_HEIGHTS.LEGAL_TEXT,
-    style: CELL_STYLES.SIZE_10,
-  },
-
-  // Строка 29: Подписи
-  {
-    data: [
-      "(ФИО гостя)_____________________________",
-      "",
-      "",
-      "(подпись) _______________________",
-    ],
-    height: ROW_HEIGHTS.SIGNATURE,
-    style: CELL_STYLES.BOLD_12,
-  },
-];
 
 /**
  * Создает бланк ТОКИО в формате Excel
@@ -185,11 +20,43 @@ export async function createExcel(): Promise<Buffer> {
   try {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Лист1");
+    const blankStructure = getBlankStructure([
+      {
+        id: "1",
+        name: "Котлета",
+        price: 123,
+        count: 2,
+      },
+      {
+        id: "2",
+        name: "Котлета",
+        price: 123,
+        count: 3,
+      },
+      {
+        id: "3",
+        name: "Котлета",
+        price: 123,
+        count: 4,
+      },
+      {
+        id: "4",
+        name: "Арбуз",
+        price: 130,
+        count: 15,
+      },
+      {
+        id: "5",
+        name: "Кола",
+        price: 80,
+        count: 34,
+      },
+    ]);
 
     logger.info("Создание бланка ТОКИО...");
 
     // Настройка ширины колонок
-    worksheet.columns = calcWidthCol(columnWidths);
+    worksheet.columns = calcWidthCol(COLUMN_WIDTH);
 
     // Добавляем логотип
     try {
@@ -214,11 +81,11 @@ export async function createExcel(): Promise<Buffer> {
 
     // Применяем структуру бланка
     logger.info(" Применение структуры бланка...");
-    applyBlankStructure(worksheet);
+    applyBlankStructure(worksheet, blankStructure);
 
     // Применяем дополнительные стили
     logger.info(" Применение стилей...");
-    applyTableStyles(worksheet);
+    applyTableStyles(worksheet, blankStructure);
 
     // Создаем дополнительные пустые листы
     workbook.addWorksheet("Лист2");

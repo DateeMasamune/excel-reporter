@@ -1,57 +1,51 @@
-import { BLANK_STRUCTURE, TABLE_CONFIG } from "./createExcel";
 import ExcelJS, { type Style } from "exceljs";
+import { TABLE_CONFIG } from "../constants";
+import type { IBlankStructure } from "./getBlankStructure";
 
 /**
  * Применяет дополнительные стили к таблице
  */
 
+const border = {
+  top: { style: "thin" },
+  bottom: { style: "thin" },
+  right: { style: "thin" },
+  left: { style: "thin" },
+} as Style["border"];
+
 const initBorderInfoRows = (
-  columns: number[],
   headerRows: number[],
+  column: number[],
   worksheet: ExcelJS.Worksheet
 ) => {
+  const firstCol = column[0];
+  const secondCol = column[1];
+  const { top, bottom, right } = border;
+
   for (const row of headerRows) {
-    for (const col of columns) {
-      const currentCell = worksheet.getCell(row, col);
-      currentCell.alignment = {
-        wrapText: true,
-        vertical: "middle",
-      };
+    const currentCell = worksheet.getCell(row, firstCol);
 
-      const closeBorder = {
-        top: { style: "thin" },
-        bottom: { style: "thin" },
-        right: { style: "thin" },
-      } as Style["border"];
-
-      if (col === columns.length) {
-        currentCell.border = closeBorder;
-      } else if (row === headerRows.length && col === 1) {
-        currentCell.border = closeBorder;
-      } else {
-        currentCell.border = {
-          top: { style: "thin" },
-          bottom: { style: "thin" },
-        };
-      }
+    if (row === headerRows[headerRows.length - 1]) {
+      const lastCell = worksheet.getCell(row, secondCol);
+      worksheet.mergeCells(`B${row}:E${row}`);
+      lastCell.border = { top, bottom, right };
+      currentCell.border = border;
+    } else {
+      worksheet.mergeCells(`A${row}:E${row}`);
+      currentCell.border = border;
     }
   }
 };
 
-const initBorderDishRow = (columns: number[], worksheet: ExcelJS.Worksheet) => {
-  for (
-    let row = TABLE_CONFIG.START_ROW;
-    row < TABLE_CONFIG.START_ROW + TABLE_CONFIG.TOTAL_ROWS;
-    row++
-  ) {
+const initBorderDishRow = (
+  columns: number[],
+  dishRows: number[],
+  worksheet: ExcelJS.Worksheet
+) => {
+  for (const row of dishRows) {
     for (const col of columns) {
       const cell = worksheet.getCell(row, col);
-      cell.border = {
-        top: { style: "thin" },
-        left: { style: "thin" },
-        bottom: { style: "thin" },
-        right: { style: "thin" },
-      };
+      cell.border = border;
       cell.alignment = {
         wrapText: true,
         vertical: "middle",
@@ -65,6 +59,7 @@ const initBorderFooter = (
   columns: number[],
   worksheet: ExcelJS.Worksheet
 ) => {
+  const { right, bottom, top } = border;
   for (const row of footerRows) {
     for (const col of columns) {
       const legalTextRow = footerRows[footerRows.length - 2];
@@ -73,20 +68,15 @@ const initBorderFooter = (
 
       if (row === legalTextRow || row === signatureRow) {
         cell.border = {
-          right: { style: "thin" },
-          bottom: { style: "thin" },
+          right,
+          bottom,
         };
       } else if (col === columns.length) {
-        cell.border = {
-          top: { style: "thin" },
-          left: { style: "thin" },
-          bottom: { style: "thin" },
-          right: { style: "thin" },
-        };
+        cell.border = border;
       } else
         cell.border = {
-          top: { style: "thin" },
-          bottom: { style: "thin" },
+          top,
+          bottom,
         };
       cell.alignment = {
         wrapText: true,
@@ -103,12 +93,7 @@ const initBorderTitleRow = (
 ) => {
   for (const col of columns) {
     const currentCell = worksheet.getCell(titleRow, col);
-    currentCell.border = {
-      top: { style: "thin" },
-      left: { style: "thin" },
-      bottom: { style: "thin" },
-      right: { style: "thin" },
-    };
+    currentCell.border = border;
     currentCell.alignment = {
       wrapText: true,
       vertical: "middle",
@@ -117,34 +102,35 @@ const initBorderTitleRow = (
   }
 };
 
-export function applyTableStyles(worksheet: ExcelJS.Worksheet) {
-  const headerRows = BLANK_STRUCTURE.slice(0, 8).map((_, index) => index + 1);
-  const footerRows = BLANK_STRUCTURE.slice(-5)
-    .map(
-      (_, index) => index + 1 + TABLE_CONFIG.TOTAL_ROWS + headerRows.length + 1
-    )
-    .slice(-5);
+export function applyTableStyles(
+  worksheet: ExcelJS.Worksheet,
+  blankStructure: IBlankStructure[]
+) {
+  const headerRows = blankStructure.slice(0, 8).map((_, index) => index + 1);
+  const footerRows = blankStructure.map((_, index) => index + 1).slice(-5);
   const columns = TABLE_CONFIG.COLUMNS.map((_, index) => index + 1);
   const titleRow = headerRows.length + 1;
+  const dishRows = Array.from(
+    {
+      length: blankStructure.length - headerRows.length - footerRows.length - 1, //title,
+    },
+    (_, i) => i + headerRows.length + 1 + 1 //title
+  );
 
   //Покраска границ информационного блока
-  initBorderInfoRows(columns, headerRows, worksheet);
+  initBorderInfoRows(headerRows, columns, worksheet);
 
   //Границы заголовка
   initBorderTitleRow(titleRow, columns, worksheet);
 
   // Границы для таблицы (строки 10-23)
-  initBorderDishRow(columns, worksheet);
+  initBorderDishRow(columns, dishRows, worksheet);
 
   //Границы для футера таблицы
   initBorderFooter(footerRows, columns, worksheet);
 
   // Форматирование чисел в таблице
-  for (
-    let row = TABLE_CONFIG.START_ROW;
-    row < TABLE_CONFIG.START_ROW + TABLE_CONFIG.TOTAL_ROWS;
-    row++
-  ) {
+  for (const row of dishRows) {
     const rowB = worksheet.getCell(`B${row}`);
     const rowD = worksheet.getCell(`D${row}`);
     [rowB, rowD].forEach((row) => {
@@ -159,11 +145,12 @@ export function applyTableStyles(worksheet: ExcelJS.Worksheet) {
   }
 
   // Форматирование итоговых сумм
-  const totalRow1 = TABLE_CONFIG.START_ROW + TABLE_CONFIG.TOTAL_ROWS;
-  const totalRow2 = totalRow1 + 1;
+  const totalSum = footerRows[footerRows.length - 4];
+  const totalSumMenu = footerRows[footerRows.length - 5];
+  const dateCreated = footerRows[footerRows.length - 3];
 
-  const eRow1 = worksheet.getCell(`E${totalRow1}`);
-  const eRow2 = worksheet.getCell(`E${totalRow2}`);
+  const eRow1 = worksheet.getCell(`E${totalSum}`);
+  const eRow2 = worksheet.getCell(`E${totalSumMenu}`);
 
   eRow1.numFmt = "#,##0.00";
   eRow2.numFmt = "#,##0.00";
@@ -176,10 +163,11 @@ export function applyTableStyles(worksheet: ExcelJS.Worksheet) {
   });
 
   // // Форматирование даты
-  worksheet.getCell(`E${totalRow2 + 1}`).numFmt = "dd.mm.yyyy";
+  worksheet.getCell(`E${dateCreated}`).numFmt = "dd.mm.yyyy";
 
   // Перенос текста для юридического текста
-  const legalTextRow = totalRow2 + 2;
+  const legalTextRow = footerRows[footerRows.length - 2];
+
   worksheet.getCell(`A${legalTextRow}`).alignment = {
     wrapText: true,
     vertical: "middle",
@@ -188,7 +176,8 @@ export function applyTableStyles(worksheet: ExcelJS.Worksheet) {
   worksheet.mergeCells(`A${legalTextRow}:E${legalTextRow}`);
 
   // Объединение ячеек для подписей
-  const signatureRow = legalTextRow + 1;
+  const signatureRow = footerRows[footerRows.length - 1];
+
   worksheet.mergeCells(`A${signatureRow}:C${signatureRow}`);
   worksheet.mergeCells(`D${signatureRow}:E${signatureRow}`);
   worksheet.getCell(`A${signatureRow}`).alignment = { horizontal: "left" };
