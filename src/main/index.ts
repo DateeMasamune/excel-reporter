@@ -1,7 +1,11 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import path, { join } from "path";
+import { createExcel } from "./utils/createExcel";
 
 ipcMain.handle("ping", () => "pong");
+ipcMain.handle("create-excel", async (event) => {
+  return await createExcel(event);
+});
 
 function createWindow() {
   const win = new BrowserWindow({
