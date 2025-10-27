@@ -1,12 +1,12 @@
 import ExcelJS from "exceljs";
-import logo from "../assets/images/logo.png";
+import logo from "../assets/images/logo.jpg";
 
 import { applyTableStyles } from "./applyTableStyles";
 import { applyBlankStructure } from "./applyBlankStructure";
 import { getLogoAsArrayBuffer } from "./getLogoAsArrayBuffer";
 import { logger } from "../logger";
 import { getBlankStructure } from "./getBlankStructure";
-import { COLUMN_WIDTH } from "../constants";
+import { COLUMN_WIDTH, IMAGE_SIZE, ROW_HEIGHTS } from "../constants";
 
 const calcWidthCol = (originalPixels: number[]) =>
   originalPixels.map((pixels) => ({
@@ -69,10 +69,13 @@ export async function createExcel(): Promise<Buffer> {
       });
 
       // Вставляем изображение в первую строку
-      // worksheet.addImage(imageId, {
-      //   tl: { col: 0, row: 0 },
-      //   ext: { width: 911, height: 280 },
-      // });
+      worksheet.addImage(imageId, {
+        tl: { col: 0.5, row: 0.9 },
+        ext: {
+          width: IMAGE_SIZE.width,
+          height: IMAGE_SIZE.height,
+        },
+      });
 
       logger.info("Логотип добавлен");
     } catch (imageError) {

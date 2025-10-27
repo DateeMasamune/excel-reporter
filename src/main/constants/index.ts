@@ -33,3 +33,8 @@ export const CELL_STYLES = {
 };
 
 export const COLUMN_WIDTH = [304, 103, 83, 92, 133];
+
+export const IMAGE_SIZE = {
+  width: 926 / 1.5,
+  height: 243 / 1.5,
+};
