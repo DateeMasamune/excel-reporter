@@ -1,3 +1,5 @@
+import type { Style } from "exceljs";
+
 const pixToPoint = (height: number) => height * 0.75;
 
 // Конфигурация высот строк
@@ -38,3 +40,10 @@ export const IMAGE_SIZE = {
   width: 926 / 1.5,
   height: 243 / 1.5,
 };
+
+export const BORDER = {
+  top: { style: "thin" },
+  bottom: { style: "thin" },
+  right: { style: "thin" },
+  left: { style: "thin" },
+} as Style["border"];
