@@ -6,4 +6,5 @@ export type TMenuItem = {
   price: number;
   count: number;
   comment?: string;
+  createdAt: string;
 };
