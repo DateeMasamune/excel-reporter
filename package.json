@@ -22,6 +22,8 @@
     "@types/exceljs": "0.5.3",
     "electron-squirrel-startup": "1.0.1",
     "exceljs": "4.4.0",
+    "lowdb": "7.0.1",
+    "lowdb-node": "3.0.2",
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "winston": "3.18.3"

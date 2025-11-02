@@ -1,11 +1,9 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow } from "electron";
 import path, { join } from "path";
-import { createExcel } from "./utils/createExcel";
+import { reactiveDB } from "./database";
+import { handleRegister } from "./utils/handleRegister";
 
-ipcMain.handle("ping", () => "pong");
-ipcMain.handle("create-excel", async (event) => {
-  return await createExcel(event);
-});
+handleRegister();
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -25,6 +23,7 @@ function createWindow() {
 
 app.whenReady().then(() => {
   createWindow();
+  reactiveDB.initialize();
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
