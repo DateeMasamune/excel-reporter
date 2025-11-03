@@ -46,6 +46,19 @@ class ReactiveLowDB extends EventEmitter {
     console.log("✅ Reactive LowDB инициализирована");
   }
 
+  @checkInitialize
+  async clearDatabase(): Promise<void> {
+    // Полностью очищаем данные
+    this.db.data = {
+      orders: [],
+    };
+
+    await this.db.write();
+    this.notifySubscribers();
+
+    console.log("✅ База данных полностью очищена");
+  }
+
   // Orders с реактивностью
   @checkInitialize
   async createOrder(order: TMenuItem) {
@@ -79,6 +92,8 @@ class ReactiveLowDB extends EventEmitter {
     this.db.data!.orders[orderIndex] = updatedOrder;
     await this.db.write();
 
+    this.notifySubscribers();
+
     return updatedOrder;
   }
 
@@ -91,6 +106,8 @@ class ReactiveLowDB extends EventEmitter {
       (order) => order.id !== id
     );
     await this.db.write();
+
+    this.notifySubscribers();
 
     return true;
   }

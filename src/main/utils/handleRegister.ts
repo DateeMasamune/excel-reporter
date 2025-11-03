@@ -1,6 +1,6 @@
 import { ipcMain } from "electron";
 import { reactiveDB } from "../database";
-import type { TMenuList, TMenuItem } from "../entities/menu-list";
+import type { TMenuList, TMenuItem, Order } from "../entities/menu-list";
 import { createExcel } from "./createExcel";
 
 const subscriptions = new Map();
@@ -29,8 +29,8 @@ export const handleRegister = () => {
     });
   });
 
-  ipcMain.handle("create-excel", async () => {
-    return await createExcel();
+  ipcMain.handle("create-excel", async (_event, order: Order) => {
+    return await createExcel(order);
   });
   ipcMain.handle("db-create-order", async (_event, orderData: TMenuItem) => {
     return await reactiveDB.createOrder(orderData);
@@ -43,5 +43,8 @@ export const handleRegister = () => {
   });
   ipcMain.handle("db-get-orders", async () => {
     return reactiveDB.getOrders();
+  });
+  ipcMain.handle("db-clear-orders", async () => {
+    return reactiveDB.clearDatabase();
   });
 };

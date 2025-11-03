@@ -7,3 +7,13 @@ export type TMenuItem = {
   count: number;
   comment?: string;
 };
+
+export type Order = {
+  dishList: TMenuList;
+  restaurant: string;
+  date: string;
+  name: string;
+  phone: string;
+  persons: string;
+  employee: string;
+};
