@@ -20,13 +20,12 @@ export const MenuList = () => {
     handleChangeCheckedItem,
   } = useChecked();
   const { open, handleClick, handleClose, anchorEl } = useAnchourElement();
-  console.log("=========>checked", checked);
 
   const debounceedSetMenuList = debounce((value: string) => {
     if (value) {
       return handleSetCopyOrders(
         sortMenuList.filter(({ name }) =>
-          name.toLowerCase().trim().includes(value.toLowerCase().trim())
+          name?.toLowerCase().trim().includes(value?.toLowerCase().trim())
         )
       );
     }

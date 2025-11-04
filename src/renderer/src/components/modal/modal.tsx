@@ -28,6 +28,7 @@ export type TModal = PropsWithChildren &
     handleClose: () => void;
     handleApply?: () => void;
     modalFooter?: ReactNode;
+    isDisabled?: boolean;
   };
 
 export const Modal = ({
@@ -38,6 +39,7 @@ export const Modal = ({
   description,
   handleClose,
   modalFooter,
+  isDisabled = false,
   ...rest
 }: TModal) => {
   return (
@@ -60,7 +62,9 @@ export const Modal = ({
         modalFooter
       ) : (
         <DialogActions>
-          <Button onClick={handleApply}>Принять</Button>
+          <Button disabled={isDisabled} onClick={handleApply}>
+            Принять
+          </Button>
           <Button onClick={handleClose}>Отмена</Button>
         </DialogActions>
       )}
