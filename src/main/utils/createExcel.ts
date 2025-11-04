@@ -7,6 +7,7 @@ import { getLogoAsArrayBuffer } from "./getLogoAsArrayBuffer";
 import { logger } from "../logger";
 import { getBlankStructure } from "./getBlankStructure";
 import { COLUMN_WIDTH, IMAGE_SIZE } from "../constants";
+import type { Order } from "../entities/menu-list";
 
 const calcWidthCol = (originalPixels: number[]) =>
   originalPixels.map((pixels) => ({
@@ -16,42 +17,11 @@ const calcWidthCol = (originalPixels: number[]) =>
 /**
  * Создает бланк ТОКИО в формате Excel
  */
-export async function createExcel(): Promise<Buffer> {
+export async function createExcel(order: Order): Promise<Buffer> {
   try {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Лист1");
-    const blankStructure = getBlankStructure([
-      {
-        id: "1",
-        name: "Котлета",
-        price: 123,
-        count: 2,
-      },
-      {
-        id: "2",
-        name: "Котлета",
-        price: 123,
-        count: 3,
-      },
-      {
-        id: "3",
-        name: "Котлета",
-        price: 123,
-        count: 4,
-      },
-      {
-        id: "4",
-        name: "Арбуз",
-        price: 130,
-        count: 15,
-      },
-      {
-        id: "5",
-        name: "Кола",
-        price: 80,
-        count: 34,
-      },
-    ]);
+    const blankStructure = getBlankStructure(order);
 
     logger.info("Создание бланка ТОКИО...");
 

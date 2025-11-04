@@ -5,9 +5,10 @@ import {
   DialogContentText,
   DialogActions,
   Button,
+  type DialogProps,
 } from "@mui/material";
 import type { TransitionProps } from "@mui/material/transitions";
-import React, { type PropsWithChildren } from "react";
+import React, { type PropsWithChildren, type ReactNode } from "react";
 import { DialogStyled } from "./styled";
 
 const Transition = React.forwardRef(function Transition(
@@ -19,13 +20,15 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export type TModal = PropsWithChildren & {
-  open: boolean;
-  title?: string;
-  description?: string;
-  handleClose: () => void;
-  handleApply?: () => void;
-};
+export type TModal = PropsWithChildren &
+  DialogProps & {
+    open: boolean;
+    title?: string;
+    description?: string;
+    handleClose: () => void;
+    handleApply?: () => void;
+    modalFooter?: ReactNode;
+  };
 
 export const Modal = ({
   open,
@@ -34,9 +37,12 @@ export const Modal = ({
   handleApply,
   description,
   handleClose,
+  modalFooter,
+  ...rest
 }: TModal) => {
   return (
     <DialogStyled
+      {...rest}
       open={open}
       slots={{
         transition: Transition,
@@ -50,10 +56,14 @@ export const Modal = ({
         {description && <DialogContentText>{description}</DialogContentText>}
         {children}
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleApply}>Принять</Button>
-        <Button onClick={handleClose}>Отмена</Button>
-      </DialogActions>
+      {modalFooter ? (
+        modalFooter
+      ) : (
+        <DialogActions>
+          <Button onClick={handleApply}>Принять</Button>
+          <Button onClick={handleClose}>Отмена</Button>
+        </DialogActions>
+      )}
     </DialogStyled>
   );
 };

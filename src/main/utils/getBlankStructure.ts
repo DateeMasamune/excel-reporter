@@ -1,6 +1,6 @@
 import type { Font } from "exceljs";
 import { ROW_HEIGHTS, CELL_STYLES, TABLE_CONFIG } from "../constants";
-import type { TMenuList } from "../entities/menu-list";
+import type { InfoRow, Order, TMenuList } from "../entities/menu-list";
 
 export type IBlankStructure = {
   data: string[];
@@ -12,57 +12,61 @@ export type IBlankStructure = {
 // Вспомогательные функции
 const formula = (expr: string) => ({ formula: expr });
 
-const infoRows = [
-  // Строка 1: Логотип (обрабатывается отдельно)
-  { data: [""], height: ROW_HEIGHTS.LOGO },
+const infoRows = (rows: InfoRow) => {
+  const { restaurant, date, name, phone, persons, employee } = rows;
 
-  // Информационный блок (строки 3-8)
-  {
-    data: ["Ресторан: Токио-Сити"],
-    height: ROW_HEIGHTS.INFO,
-    style: CELL_STYLES.BOLD_12,
-  },
-  {
-    data: ["Дата и время мероприятия:"],
-    height: ROW_HEIGHTS.INFO,
-    style: CELL_STYLES.BOLD_12,
-  },
-  {
-    data: ["Имя контактного лица:"],
-    height: ROW_HEIGHTS.INFO,
-    style: CELL_STYLES.BOLD_12,
-  },
-  {
-    data: ["Телефон:"],
-    height: ROW_HEIGHTS.INFO,
-    style: CELL_STYLES.BOLD_12,
-  },
-  {
-    data: ["Кол-во персон:"],
-    height: ROW_HEIGHTS.INFO,
-    style: CELL_STYLES.BOLD_12,
-  },
-  {
-    data: ["П/З принял (сотрудник):"],
-    height: ROW_HEIGHTS.INFO,
-    style: CELL_STYLES.BOLD_12,
-  },
+  return [
+    // Строка 1: Логотип (обрабатывается отдельно)
+    { data: [""], height: ROW_HEIGHTS.LOGO },
 
-  // Строка 9: Сумма
-  {
-    data: ["Сумма:", "", "", "", formula(``)],
-    height: ROW_HEIGHTS.INFO,
-    style: CELL_STYLES.BOLD_12,
-  },
+    // Информационный блок (строки 3-8)
+    {
+      data: [`Ресторан: ${restaurant}`],
+      height: ROW_HEIGHTS.INFO,
+      style: CELL_STYLES.BOLD_12,
+    },
+    {
+      data: [`Дата и время мероприятия: ${date}`],
+      height: ROW_HEIGHTS.INFO,
+      style: CELL_STYLES.BOLD_12,
+    },
+    {
+      data: [`Имя контактного лица: ${name}`],
+      height: ROW_HEIGHTS.INFO,
+      style: CELL_STYLES.BOLD_12,
+    },
+    {
+      data: [`Телефон: ${phone}`],
+      height: ROW_HEIGHTS.INFO,
+      style: CELL_STYLES.BOLD_12,
+    },
+    {
+      data: [`Кол-во персон: ${persons}`],
+      height: ROW_HEIGHTS.INFO,
+      style: CELL_STYLES.BOLD_12,
+    },
+    {
+      data: [`П/З принял (сотрудник): ${employee}`],
+      height: ROW_HEIGHTS.INFO,
+      style: CELL_STYLES.BOLD_12,
+    },
 
-  // Строка 10: Заголовок таблицы
-  {
-    data: TABLE_CONFIG.COLUMNS,
-    height: ROW_HEIGHTS.TABLE_HEADER,
-    isHeader: true,
-    style: CELL_STYLES.BOLD_12,
-  },
-];
+    // Строка 9: Сумма
+    {
+      data: ["Сумма:", "", "", "", formula(``)],
+      height: ROW_HEIGHTS.INFO,
+      style: CELL_STYLES.BOLD_12,
+    },
+
+    // Строка 10: Заголовок таблицы
+    {
+      data: TABLE_CONFIG.COLUMNS,
+      height: ROW_HEIGHTS.TABLE_HEADER,
+      isHeader: true,
+      style: CELL_STYLES.BOLD_12,
+    },
+  ];
+};
 
 const footerRows = [
   {
@@ -123,11 +127,14 @@ const mapMenuList = (menuList: TMenuList) => {
   }));
 };
 
-export const getBlankStructure = (menuList: TMenuList) => {
+export const getBlankStructure = (order: Order) => {
   // Определение структуры бланка с высотами
-  const summFormula = `SUM(E${infoRows.length + menuList.length + 1})`;
+  const { dishList, ...rest } = order;
+  const rows = infoRows(rest);
 
-  infoRows[infoRows.length - 2] = {
+  const summFormula = `SUM(E${rows.length + dishList.length + 1})`;
+
+  rows[rows.length - 2] = {
     data: ["Сумма:", formula(summFormula)],
     height: ROW_HEIGHTS.INFO,
     style: CELL_STYLES.BOLD_12,
@@ -140,7 +147,7 @@ export const getBlankStructure = (menuList: TMenuList) => {
       "",
       "",
       formula(
-        `SUM(D${infoRows.length + 1}:D${infoRows.length + menuList.length})`
+        `SUM(D${rows.length + 1}:D${rows.length + dishList.length})`
       ),
     ],
     height: ROW_HEIGHTS.SUMMARY,
@@ -154,8 +161,8 @@ export const getBlankStructure = (menuList: TMenuList) => {
   };
 
   return [
-    ...infoRows,
-    ...mapMenuList(menuList),
+    ...rows,
+    ...mapMenuList(dishList),
     ...footerRows,
   ] as IBlankStructure[];
 };

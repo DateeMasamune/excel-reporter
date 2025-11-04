@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Modal, type TModal } from "@renderer/components/modal";
 
 type Props = Omit<TModal, "handleApply"> & {
-  dish?: TMenuItem;
+  dish: Partial<TMenuItem>;
   callback: (dish: TMenuItem) => void;
 };
 
@@ -16,7 +16,7 @@ export const DishModal = ({
   callback,
   handleClose,
 }: Props) => {
-  const [newDish, setNewDish] = useState<TMenuItem>(dish ?? ({} as TMenuItem));
+  const [newDish, setNewDish] = useState<Partial<TMenuItem>>(dish);
 
   const handleAddDish = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -37,8 +37,8 @@ export const DishModal = ({
       return;
     }
 
-    callback?.(newDish);
-    setNewDish({} as TMenuItem);
+    callback?.(newDish as TMenuItem);
+    setNewDish(dish as TMenuItem);
     handleClose();
   };
 
@@ -69,6 +69,23 @@ export const DishModal = ({
             type="number"
             error={!newDish[FIELD_NAMES.PRICE]}
             helperText={!newDish[FIELD_NAMES.PRICE] && "Заполните поле"}
+          />
+          <TextField
+            onChange={handleAddDish}
+            value={newDish[FIELD_NAMES.COUNT] ?? ""}
+            name={FIELD_NAMES.COUNT}
+            label="Количество"
+            fullWidth
+            type="number"
+            error={!newDish[FIELD_NAMES.COUNT]}
+            helperText={!newDish[FIELD_NAMES.COUNT] && "Заполните поле"}
+          />
+          <TextField
+            onChange={handleAddDish}
+            value={newDish[FIELD_NAMES.COMMENT] ?? ""}
+            name={FIELD_NAMES.COMMENT}
+            label="Комментарий к блюду"
+            fullWidth
           />
         </Grid>
       </Modal>

@@ -23,6 +23,7 @@ export const SettingsButton = ({
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         {menuItems?.map(({ onClick, buttonName }) => (
           <MenuItem
+            key={buttonName}
             onClick={() => {
               onClick?.();
               handleClose();

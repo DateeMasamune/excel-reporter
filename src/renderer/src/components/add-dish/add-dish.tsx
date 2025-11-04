@@ -2,12 +2,18 @@ import { Button } from "@mui/material";
 import { useModal } from "@renderer/shared/hooks/use-modal";
 import type { TMenuItem } from "@renderer/entities/menu-list";
 import { DishModal } from "@renderer/components/dish-modal";
+import { useContext } from "react";
+import { SubscribeOrdersContext } from "@renderer/context/SubscribeOrdersContext";
 
 export const AddDish = () => {
   const { open, handleClose, handleOpen } = useModal();
+  const { create } = useContext(SubscribeOrdersContext);
+  const dish = {
+    count: 1,
+  };
 
   const addDish = (dish: TMenuItem) => {
-    console.log("=========>dish", dish);
+    create(dish);
   };
 
   return (
@@ -16,6 +22,7 @@ export const AddDish = () => {
         Добавить блюдо
       </Button>
       <DishModal
+        dish={dish}
         open={open}
         callback={addDish}
         handleClose={handleClose}
