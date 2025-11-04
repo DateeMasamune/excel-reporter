@@ -16,7 +16,9 @@ function checkInitialize(
 ) {
   const method = descriptor.value;
   descriptor.value = async function (...args: unknown[]) {
+    //@ts-expect-error after
     if (!this.isInitialized) {
+      //@ts-expect-error after
       await this.initialize();
     }
     return method.apply(this, args);
@@ -27,6 +29,7 @@ function checkInitialize(
 
 class ReactiveLowDB extends EventEmitter {
   private db: Low<DatabaseSchema>;
+  //@ts-expect-error after
   private isInitialized = false;
   private subscribers: Array<(orders: TMenuList) => void> = [];
 

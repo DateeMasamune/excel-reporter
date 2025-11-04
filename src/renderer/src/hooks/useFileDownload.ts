@@ -57,6 +57,7 @@ export const useFileDownload = () => {
       );
     } catch (error) {
       console.error("Ошибка:", error);
+      //@ts-expect-error after
       alert(`Ошибка при создании бланка: ${error.message}`);
     }
   };

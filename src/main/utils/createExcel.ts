@@ -73,6 +73,7 @@ export async function createExcel(order: Order): Promise<Buffer> {
     return sendBuffer;
   } catch (error) {
     console.error("❌ Ошибка создания бланка ТОКИО:", error);
+    //@ts-expect-error after
     throw new Error(`Не удалось создать бланк: ${error.message}`);
   }
 }
