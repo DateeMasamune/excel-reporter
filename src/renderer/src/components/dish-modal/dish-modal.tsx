@@ -1,7 +1,7 @@
 import { FIELD_NAMES } from "@renderer/constants/field-names";
 import type { TMenuItem } from "@renderer/entities/menu-list";
 import { Grid, TextField } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal, type TModal } from "@renderer/components/modal";
 
 type Props = Omit<TModal, "handleApply"> & {
@@ -17,6 +17,7 @@ export const DishModal = ({
   handleClose,
 }: Props) => {
   const [newDish, setNewDish] = useState<Partial<TMenuItem>>(dish);
+  const [isError, setIsError] = useState(true);
 
   const handleAddDish = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -42,6 +43,14 @@ export const DishModal = ({
     handleClose();
   };
 
+  useEffect(() => {
+    setIsError(
+      !newDish[FIELD_NAMES.NAME] ||
+        !newDish[FIELD_NAMES.PRICE] ||
+        !newDish[FIELD_NAMES.COUNT]
+    );
+  }, [newDish]);
+
   return (
     <>
       <Modal
@@ -49,6 +58,7 @@ export const DishModal = ({
         open={open}
         handleClose={handleClose}
         handleApply={handleApply}
+        isDisabled={isError}
       >
         <Grid container spacing={2} direction="column">
           <TextField

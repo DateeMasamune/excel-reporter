@@ -114,7 +114,6 @@ export const ExcelSettingsModal = ({
             >
               Скачать
             </Button>
-            <Button onClick={handleDownloadExcel}>Принять</Button>
             <Button onClick={closeModal}>Отмена</Button>
           </DialogActions>
         }

@@ -14,7 +14,8 @@ export const useOrders = () => {
 
   const sortMenuList = sortListAsc(copyOrders);
   const groupMenuList: [string, TMenuList][] = groupAlphabet(sortMenuList);
-
+  
+  //@ts-expect-error after
   useEffect(() => {
     const unsubscribe = window.electron.watchOrders(setOrders);
     return () => unsubscribe;

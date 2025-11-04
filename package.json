@@ -5,14 +5,18 @@
   "description": "excel reporter",
   "main": "out/main/index.js",
   "scripts": {
-    "build": "tsc -b && vite build",
+    "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
+    "typecheck:web": "tsc --noEmit -p tsconfig.app.json --composite false",
+    "typecheck": "npm run typecheck:node && npm run typecheck:web",
+    "build": "npm run typecheck && electron-vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
-    "prebuild": "electron-vite build"
+    "prebuild": "electron-vite build",
+    "build:win": "npm run build && electron-builder --win"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
@@ -26,6 +30,7 @@
     "lowdb-node": "3.0.2",
     "react": "19.1.1",
     "react-dom": "19.1.1",
+    "react-error-boundary": "^6.0.0",
     "winston": "3.18.3"
   },
   "devDependencies": {
@@ -43,6 +48,7 @@
     "@types/react-dom": "19.1.9",
     "@vitejs/plugin-react": "5.0.4",
     "electron": "38.3.0",
+    "electron-builder": "25.1.8",
     "electron-vite": "4.0.1",
     "eslint": "9.36.0",
     "eslint-plugin-react-hooks": "5.2.0",

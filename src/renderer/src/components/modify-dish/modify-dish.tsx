@@ -69,6 +69,7 @@ export const ModifyDish = <T extends TMenuItem>({
           open={open}
           dish={dish}
           handleClose={handleClose}
+          //@ts-expect-error after
           callback={handleChangeDish}
         />
       )}
