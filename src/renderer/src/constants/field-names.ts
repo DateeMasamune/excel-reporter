@@ -3,7 +3,7 @@ export const FIELD_NAMES = {
   NAME: "name",
   PRICE: "price",
   COUNT: "count",
-  COMMENT: 'comment'
+  COMMENT: "comment",
 } as const;
 
 export const EXCEL_FIELD_NAMES = {
@@ -13,4 +13,8 @@ export const EXCEL_FIELD_NAMES = {
   PHONE: "phone",
   PERSONS: "persons",
   EMPLOYEE: "employee",
-};
+} as const;
+
+export const TAB_FIELD_NAMES = {
+  NAME: "name",
+} as const;

@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { ListSubheader, Menu } from "@mui/material";
+import { ListSubheader, Menu, Skeleton } from "@mui/material";
 
 export const ListSubheaderStyled = styled(ListSubheader)`
   top: 56px;
@@ -16,4 +16,10 @@ export const MenuStyled = styled(Menu)`
 
 export const UlStyled = styled("ul")`
   padding: unset;
+`;
+
+export const SkeletonStyled = styled(Skeleton)`
+  width: 90%;
+  height: 50px;
+  margin: 0 auto;
 `;

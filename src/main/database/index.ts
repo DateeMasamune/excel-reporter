@@ -3,10 +3,18 @@ import { JSONFile } from "lowdb/node";
 import { app } from "electron";
 import path from "path";
 import { EventEmitter } from "events";
-import type { TMenuItem, TMenuList } from "../entities/menu-list";
+import type {
+  FilterDishes,
+  Tab,
+  TMenuItem,
+  TMenuList,
+} from "../entities/menu-list";
+import { v4 as uuidv4 } from "uuid";
+import { TABLE_NAMES, TABLE_CONFIG } from "./constants";
 
 interface DatabaseSchema {
-  orders: TMenuList;
+  [TABLE_NAMES.ORDERS]: TMenuList;
+  [TABLE_NAMES.TABS]: Tab[];
 }
 
 function checkInitialize(
@@ -27,11 +35,32 @@ function checkInitialize(
   return descriptor;
 }
 
+function checkFieldDB(
+  _target: unknown,
+  _propertyName: string,
+  descriptor: PropertyDescriptor
+) {
+  const method = descriptor.value;
+  descriptor.value = function (...args: unknown[]) {
+    for (const { name, initValue } of TABLE_CONFIG) {
+      //@ts-expect-error after
+      if (!this.db.data[name]) {
+        //@ts-expect-error after
+        this.db.data[name] = initValue;
+      }
+    }
+
+    return method.apply(this, args);
+  };
+
+  return descriptor;
+}
+
 class ReactiveLowDB extends EventEmitter {
   private db: Low<DatabaseSchema>;
   //@ts-expect-error after
   private isInitialized = false;
-  private subscribers: Array<(orders: TMenuList) => void> = [];
+  private subscribers: Array<() => void> = [];
 
   constructor() {
     super();
@@ -39,7 +68,8 @@ class ReactiveLowDB extends EventEmitter {
     const adapter = new JSONFile<DatabaseSchema>(dbPath);
 
     this.db = new Low(adapter, {
-      orders: [],
+      [TABLE_NAMES.ORDERS]: [],
+      [TABLE_NAMES.TABS]: [],
     });
   }
 
@@ -53,7 +83,8 @@ class ReactiveLowDB extends EventEmitter {
   async clearDatabase(): Promise<void> {
     // Полностью очищаем данные
     this.db.data = {
-      orders: [],
+      [TABLE_NAMES.ORDERS]: [],
+      [TABLE_NAMES.TABS]: [],
     };
 
     await this.db.write();
@@ -64,14 +95,15 @@ class ReactiveLowDB extends EventEmitter {
 
   // Orders с реактивностью
   @checkInitialize
+  @checkFieldDB
   async createOrder(order: TMenuItem) {
     const newOrder = {
       ...order,
-      id: `order_${Date.now()}`,
+      id: `order_${uuidv4()}`,
       createdAt: new Date().toISOString(),
     };
 
-    this.db.data!.orders.unshift(newOrder);
+    this.db.data![TABLE_NAMES.ORDERS].unshift(newOrder);
     await this.db.write();
 
     this.notifySubscribers();
@@ -80,19 +112,20 @@ class ReactiveLowDB extends EventEmitter {
   }
 
   @checkInitialize
+  @checkFieldDB
   async updateOrder(updates: Partial<TMenuItem>) {
     const { id } = updates;
-    const orderIndex = this.db.data!.orders.findIndex(
+    const orderIndex = this.db.data![TABLE_NAMES.ORDERS].findIndex(
       (order) => order.id === id
     );
     if (orderIndex === -1) return null;
 
     const updatedOrder = {
-      ...this.db.data!.orders[orderIndex],
+      ...this.db.data![TABLE_NAMES.ORDERS][orderIndex],
       ...updates,
     };
 
-    this.db.data!.orders[orderIndex] = updatedOrder;
+    this.db.data![TABLE_NAMES.ORDERS][orderIndex] = updatedOrder;
     await this.db.write();
 
     this.notifySubscribers();
@@ -101,13 +134,16 @@ class ReactiveLowDB extends EventEmitter {
   }
 
   @checkInitialize
+  @checkFieldDB
   async deleteOrder(id: string) {
-    const orderToDelete = this.db.data!.orders.find((order) => order.id === id);
+    const orderToDelete = this.db.data![TABLE_NAMES.ORDERS].find(
+      (order) => order.id === id
+    );
     if (!orderToDelete) return false;
 
-    this.db.data!.orders = this.db.data!.orders.filter(
-      (order) => order.id !== id
-    );
+    this.db.data![TABLE_NAMES.ORDERS] = this.db.data![
+      TABLE_NAMES.ORDERS
+    ].filter((order) => order.id !== id);
     await this.db.write();
 
     this.notifySubscribers();
@@ -117,23 +153,110 @@ class ReactiveLowDB extends EventEmitter {
 
   // Реактивные геттеры
   @checkInitialize
-  async getOrders() {
-    return this.db.data!.orders;
+  @checkFieldDB
+  async getOrders(filter?: FilterDishes) {
+    const { tabId } = filter || {};
+
+    if (tabId && tabId !== "all") {
+      return this.db.data![TABLE_NAMES.ORDERS]?.filter(
+        (dish) => dish.tabId === tabId
+      );
+    }
+
+    if (tabId && tabId === "all") {
+      return this.db.data![TABLE_NAMES.ORDERS]?.filter((dish) => !dish.tabId);
+    }
+
+    return this.db.data![TABLE_NAMES.ORDERS];
   }
 
-  // Подписка на изменения
-  subscribe(event: string, callback: (data: TMenuItem) => void) {
-    this.on(event, callback);
-    return () => this.off(event, callback);
+  @checkInitialize
+  @checkFieldDB
+  async createTab(tab: Tab) {
+    const newTab = {
+      ...tab,
+      id: `tab_${uuidv4()}`,
+      createdAt: new Date().toISOString(),
+    };
+
+    this.db.data![TABLE_NAMES.TABS].unshift(newTab);
+    await this.db.write();
+
+    this.notifySubscribers();
+
+    return newTab;
   }
 
-  // Реактивные queries
-  async watchOrders(callback: (orders: TMenuList) => void) {
+  @checkInitialize
+  @checkFieldDB
+  async deleteTab(id: string) {
+    const tabToDelete = this.db.data![TABLE_NAMES.TABS].find(
+      (order) => order.id === id
+    );
+    if (!tabToDelete) return false;
+
+    this.db.data![TABLE_NAMES.TABS] = this.db.data![TABLE_NAMES.TABS].filter(
+      (order) => order.id !== id
+    );
+    await this.db.write();
+
+    this.notifySubscribers();
+
+    return true;
+  }
+
+  @checkInitialize
+  @checkFieldDB
+  async updateTab(updates: Partial<Tab>) {
+    const { id } = updates;
+    const orderIndex = this.db.data![TABLE_NAMES.TABS].findIndex(
+      (order) => order.id === id
+    );
+    if (orderIndex === -1) return null;
+
+    const updatedTab = {
+      ...this.db.data![TABLE_NAMES.TABS][orderIndex],
+      ...updates,
+    };
+
+    this.db.data![TABLE_NAMES.TABS][orderIndex] = updatedTab;
+    await this.db.write();
+
+    this.notifySubscribers();
+
+    return updatedTab;
+  }
+
+  @checkInitialize
+  @checkFieldDB
+  async getTabs() {
+    return this.db.data![TABLE_NAMES.TABS];
+  }
+
+  @checkInitialize
+  @checkFieldDB
+  async copyDishes(dishes: TMenuList, tabId: string) {
+    const copyDishes = dishes.map((dish) => ({
+      ...dish,
+      id: `order_${uuidv4()}`,
+      createdAt: new Date().toISOString(),
+      tabId,
+    }));
+
+    this.db.data![TABLE_NAMES.ORDERS].unshift(...copyDishes);
+    await this.db.write();
+
+    this.notifySubscribers();
+
+    return copyDishes;
+  }
+
+  async watchData(callback: () => Promise<void>) {
     // Добавляем callback в список подписчиков
     this.subscribers.push(callback);
 
     // Сразу отправляем текущие данные
-    callback(await this.getOrders());
+    await callback();
 
     // Возвращаем функцию отписки
     return () => {
@@ -142,9 +265,8 @@ class ReactiveLowDB extends EventEmitter {
   }
 
   private async notifySubscribers() {
-    const currentOrders = await this.getOrders();
     this.subscribers.forEach((callback) => {
-      callback(currentOrders); // Вызываем ВСЕ функции-подписчики
+      callback(); // Вызываем ВСЕ функции-подписчики
     });
   }
 }

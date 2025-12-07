@@ -1,8 +1,16 @@
+import { debounce } from "@mui/material";
 import type { TMenuItem, TMenuList } from "@renderer/entities/menu-list";
 import { useState } from "react";
 
 export const useChecked = () => {
   const [checked, setChecked] = useState<TMenuList>([]);
+
+  const handleAllChecked = debounce(<T extends TMenuItem>(list: T[]) => {
+    if (checked?.length) {
+      return setChecked([]);
+    }
+    setChecked(list);
+  }, 150);
 
   const handleToggle =
     <T extends TMenuItem>(menuItem: T) =>
@@ -39,6 +47,7 @@ export const useChecked = () => {
   return {
     checked,
     handleToggle,
+    handleAllChecked,
     handleClearChecked,
     handleDeleteCheckedItem,
     handleChangeCheckedItem,

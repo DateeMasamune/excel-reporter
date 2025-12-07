@@ -5,6 +5,7 @@ export type TMenuItem = {
   name: string;
   price: number;
   count: number;
+  tabId?: string;
   comment?: string;
   createdAt?: string;
 };
@@ -20,3 +21,13 @@ export type Order = {
 };
 
 export type InfoRow = Omit<Order, "dishList">;
+
+export type Tab = {
+  id?: string;
+  name: string;
+  createdAt?: string;
+};
+
+export type FilterDishes = {
+  tabId?: string;
+};

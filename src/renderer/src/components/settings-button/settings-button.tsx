@@ -1,7 +1,8 @@
-import { Grid, IconButton, Menu, MenuItem, Button } from "@mui/material";
+import { Grid, IconButton } from "@mui/material";
 import type { ReactElement } from "react";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useAnchourElement } from "@renderer/shared/hooks/use-anchor-element";
+import { SettingsMenu } from "../settings-menu";
 
 type Props = {
   icon?: ReactElement;
@@ -20,19 +21,12 @@ export const SettingsButton = ({
   return (
     <Grid container direction="column">
       <IconButton onClick={handleClick}>{icon}</IconButton>
-      <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-        {menuItems?.map(({ onClick, buttonName }) => (
-          <MenuItem
-            key={buttonName}
-            onClick={() => {
-              onClick?.();
-              handleClose();
-            }}
-          >
-            <Button>{buttonName}</Button>
-          </MenuItem>
-        ))}
-      </Menu>
+      <SettingsMenu
+        menuItems={menuItems}
+        open={open}
+        handleClose={handleClose}
+        anchorEl={anchorEl}
+      />
     </Grid>
   );
 };
