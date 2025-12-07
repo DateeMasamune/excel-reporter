@@ -5,8 +5,8 @@ import { EXCEL_FIELD_NAMES } from "@renderer/constants/field-names";
 import { useContext, useState } from "react";
 import { List } from "../list";
 import type { TMenuItem, TMenuList } from "@renderer/entities/menu-list";
-import { SubscribeOrdersContext } from "@renderer/context/SubscribeOrdersContext";
 import { useFileDownload } from "@renderer/hooks/useFileDownload";
+import { SubscribeOrdersContext } from "@renderer/context/orders";
 
 type Props = {
   dishList: TMenuList;

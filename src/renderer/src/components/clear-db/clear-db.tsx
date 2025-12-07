@@ -6,7 +6,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import { SubscribeOrdersContext } from "@renderer/context/SubscribeOrdersContext";
+import { SubscribeOrdersContext } from "@renderer/context/orders";
 import type { TMenuItem } from "@renderer/entities/menu-list";
 import { useChecked } from "@renderer/shared/hooks/use-checked";
 import { useContext } from "react";

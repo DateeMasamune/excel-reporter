@@ -3,7 +3,7 @@ import { useModal } from "@renderer/shared/hooks/use-modal";
 import type { TMenuItem } from "@renderer/entities/menu-list";
 import { DishModal } from "@renderer/components/dish-modal";
 import { useContext } from "react";
-import { SubscribeOrdersContext } from "@renderer/context/SubscribeOrdersContext";
+import { SubscribeOrdersContext } from "@renderer/context/orders";
 
 export const AddDish = () => {
   const { open, handleClose, handleOpen } = useModal();

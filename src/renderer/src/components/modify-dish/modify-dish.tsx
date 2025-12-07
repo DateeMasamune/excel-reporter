@@ -5,7 +5,7 @@ import { SettingsButton } from "@renderer/components/settings-button";
 import { DishModal as ChangeDishModal } from "@renderer/components/dish-modal";
 import type { TMenuItem } from "@renderer/entities/menu-list";
 import { useContext } from "react";
-import { SubscribeOrdersContext } from "@renderer/context/SubscribeOrdersContext";
+import { SubscribeOrdersContext } from "@renderer/context/orders";
 
 type Props<T extends TMenuItem> = {
   dish: T;

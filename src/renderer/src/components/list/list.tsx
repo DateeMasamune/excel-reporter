@@ -5,9 +5,12 @@ import {
   Checkbox,
   ListItemText,
   Typography,
+  Chip,
 } from "@mui/material";
 import { ModifyDish } from "../modify-dish";
 import type { TMenuList } from "@renderer/entities/menu-list";
+import { SubscribeTabsContext } from "@renderer/context/tabs";
+import { useContext } from "react";
 
 type Props<T extends TMenuList> = {
   listItems: T;
@@ -26,6 +29,8 @@ export const List = <T extends TMenuList>({
   handleDeleteItem,
   handleChangeItem,
 }: Props<T>) => {
+  const { tabs } = useContext(SubscribeTabsContext);
+
   return listItems.map((item) => {
     const isChecked = checked?.find(({ id }) => id === item.id);
     return (
@@ -43,6 +48,15 @@ export const List = <T extends TMenuList>({
               <Checkbox edge="start" checked={!!isChecked} disableRipple />
             </ListItemIcon>
             <ListItemText id={item.name} primary={item.name} />
+            {item?.tabId ? (
+              <Chip
+                label={tabs?.find(({ id }) => item?.tabId === id)?.name}
+                color="success"
+                variant="outlined"
+              />
+            ) : (
+              <Chip label="Без вкладки" color="primary" variant="outlined" />
+            )}
           </ListItemButton>
         ) : (
           <Typography variant="subtitle1">{item.name}</Typography>

@@ -5,6 +5,7 @@ export type TMenuItem = {
   name: string;
   price: number;
   count: number;
+  tabId?: string;
   comment?: string;
 };
 
@@ -16,4 +17,9 @@ export type Order = {
   phone: string;
   persons: string;
   employee: string;
+};
+
+export type Tab = {
+  name: string;
+  id: string;
 };

@@ -1,25 +1,45 @@
 import { useAnchourElement } from "@renderer/shared/hooks/use-anchor-element";
 import { useChecked } from "@renderer/shared/hooks/use-checked";
-import { Button, List, debounce } from "@mui/material";
-import { ListSubheaderStyled, MenuStyled, UlStyled } from "./styled";
+import {
+  Button,
+  Checkbox,
+  Grid,
+  List,
+  Typography,
+  debounce,
+} from "@mui/material";
+import {
+  ListSubheaderStyled,
+  MenuStyled,
+  SkeletonStyled,
+  UlStyled,
+} from "./styled";
 import { useContext, useMemo } from "react";
 import { SearchInput } from "@renderer/components/search-input";
 import { List as DishList } from "@renderer/components/list";
-import { SubscribeOrdersContext } from "@renderer/context/SubscribeOrdersContext";
 import { ExcelSettingsModal } from "../excel-settings-modal";
+import { Tabs } from "../tabs";
+import { SubscribeOrdersContext } from "@renderer/context/orders";
+import { MenuFooter } from "../menu-footer";
+import { SubscribeTabsContext } from "@renderer/context/tabs";
 
 export const MenuList = () => {
   const { orders, sortMenuList, groupMenuList, handleSetCopyOrders } =
     useContext(SubscribeOrdersContext);
 
+  const { isPending } = useContext(SubscribeTabsContext);
+
   const {
     checked,
     handleToggle,
+    handleAllChecked,
     handleClearChecked,
     handleDeleteCheckedItem,
     handleChangeCheckedItem,
   } = useChecked();
   const { open, handleClick, handleClose, anchorEl } = useAnchourElement();
+
+  const isChecked = checked.length;
 
   const debounceedSetMenuList = debounce((value: string) => {
     if (value) {
@@ -35,23 +55,29 @@ export const MenuList = () => {
 
   const render = useMemo(
     () =>
-      groupMenuList?.map((groupMenuItem, index) => {
-        const [char, menuList] = groupMenuItem || [""];
+      groupMenuList?.length ? (
+        groupMenuList?.map((groupMenuItem, index) => {
+          const [char, menuList] = groupMenuItem || [""];
 
-        return (
-          <li key={`section-${index}`}>
-            <UlStyled>
-              <ListSubheaderStyled>{char}</ListSubheaderStyled>
-              <DishList
-                isCheckbox
-                checked={checked}
-                listItems={menuList}
-                handleToggle={handleToggle}
-              />
-            </UlStyled>
-          </li>
-        );
-      }),
+          return (
+            <li key={`section-${index}-${char}-${menuList?.length}`}>
+              <UlStyled>
+                <ListSubheaderStyled>{char}</ListSubheaderStyled>
+                <DishList
+                  isCheckbox
+                  checked={checked}
+                  listItems={menuList}
+                  handleToggle={handleToggle}
+                />
+              </UlStyled>
+            </li>
+          );
+        })
+      ) : (
+        <Typography textAlign="center" variant="h6">
+          Список пуст
+        </Typography>
+      ),
     [groupMenuList, checked]
   );
 
@@ -61,8 +87,39 @@ export const MenuList = () => {
         Меню
       </Button>
       <MenuStyled anchorEl={anchorEl} open={open} onClose={handleClose}>
+        <Tabs />
         <SearchInput callback={debounceedSetMenuList} />
-        <List subheader={<li />}>{render}</List>
+        <List subheader={<li />}>
+          <Grid
+            direction="row"
+            container
+            alignItems="center"
+            gap="10px"
+            paddingLeft="16px"
+          >
+            <Checkbox
+              edge="start"
+              checked={!!isChecked}
+              disableRipple
+              onClick={() =>
+                handleAllChecked(
+                  Object.values(Object.fromEntries(groupMenuList)).flat()
+                )
+              }
+            />
+            <Typography variant="subtitle2">Выбрать все</Typography>
+          </Grid>
+          {isPending
+            ? Array.from({ length: 5 }, () => (
+                <SkeletonStyled animation="wave" />
+              ))
+            : render}
+        </List>
+        <MenuFooter
+          isChecked={!!isChecked}
+          checked={checked}
+          handleAllChecked={handleAllChecked}
+        />
       </MenuStyled>
       <ExcelSettingsModal
         dishList={checked}
