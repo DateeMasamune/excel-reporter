@@ -9,10 +9,13 @@ import { ErrorBoundary } from "react-error-boundary";
 import { Fallback } from "./components/fallback";
 import { SubscribeTabsProvider } from "./context/tabs";
 import { SubscribeOrdersProvider } from "./context/orders";
+import { SnowAnimation } from "./components/snow-animation";
+import { ChristmasTree } from "./components/christmas-tree";
 
 function App() {
   return (
     <>
+      <SnowAnimation />
       <ErrorBoundary fallbackRender={Fallback}>
         <ThemeProvider theme={theme}>
           <SubscribeTabsProvider>
@@ -35,6 +38,7 @@ function App() {
           <CssBaseline />
         </ThemeProvider>
       </ErrorBoundary>
+      <ChristmasTree />
     </>
   );
 }

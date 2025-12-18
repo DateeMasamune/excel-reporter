@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback, useContext } from "react";
 export const useOrders = () => {
   const [orders, setOrders] = useState<TMenuList>([]);
   const [copyOrders, setCopyOrders] = useState<TMenuList>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { activeTab } = useContext(SubscribeTabsContext);
 
   const handleSetCopyOrders = useCallback(
@@ -17,17 +18,23 @@ export const useOrders = () => {
   const sortMenuList = sortListAsc(copyOrders);
   const groupMenuList: [string, TMenuList][] = groupAlphabet(sortMenuList);
 
-  const fetchOrders = async () => {
-    const unsubscribe = await window.electron.watchOrders(setOrders, {
+  useEffect(() => {
+    setIsLoading(true);
+    setOrders([]);
+    setCopyOrders([]);
+
+    const handleOrders = (newOrders: TMenuList) => {
+      setOrders(newOrders);
+      setIsLoading(false);
+    };
+
+    const unsubPromise = window.electron.watchOrders(handleOrders, {
       tabId: activeTab?.id,
     });
-    return () => unsubscribe();
-  };
 
-  //@ts-expect-error after
-  useEffect(() => {
-    fetchOrders();
-    return () => fetchOrders();
+    return () => {
+      unsubPromise.then((unsubscribe) => unsubscribe());
+    };
   }, [activeTab]);
 
   useEffect(() => {
@@ -39,6 +46,7 @@ export const useOrders = () => {
     copyOrders,
     sortMenuList,
     groupMenuList,
+    isLoading,
     handleSetCopyOrders,
     create: window.electron.createOrder,
     update: window.electron.updateOrder,

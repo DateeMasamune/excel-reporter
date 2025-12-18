@@ -21,13 +21,15 @@ import { ExcelSettingsModal } from "../excel-settings-modal";
 import { Tabs } from "../tabs";
 import { SubscribeOrdersContext } from "@renderer/context/orders";
 import { MenuFooter } from "../menu-footer";
-import { SubscribeTabsContext } from "@renderer/context/tabs";
 
 export const MenuList = () => {
-  const { orders, sortMenuList, groupMenuList, handleSetCopyOrders } =
-    useContext(SubscribeOrdersContext);
-
-  const { isPending } = useContext(SubscribeTabsContext);
+  const {
+    orders,
+    sortMenuList,
+    groupMenuList,
+    handleSetCopyOrders,
+    isLoading,
+  } = useContext(SubscribeOrdersContext);
 
   const {
     checked,
@@ -109,9 +111,9 @@ export const MenuList = () => {
             />
             <Typography variant="subtitle2">Выбрать все</Typography>
           </Grid>
-          {isPending
-            ? Array.from({ length: 5 }, () => (
-                <SkeletonStyled animation="wave" />
+          {isLoading
+            ? Array.from({ length: 5 }, (_, index) => (
+                <SkeletonStyled key={index} animation="wave" />
               ))
             : render}
         </List>

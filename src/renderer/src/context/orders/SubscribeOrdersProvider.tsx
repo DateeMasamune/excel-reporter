@@ -13,6 +13,7 @@ export const SubscribeOrdersProvider = ({ children }: PropsWithChildren) => {
     sortMenuList,
     groupMenuList,
     clearDatabase,
+    isLoading,
     handleSetCopyOrders,
   } = useOrders();
 
@@ -27,6 +28,7 @@ export const SubscribeOrdersProvider = ({ children }: PropsWithChildren) => {
       sortMenuList,
       clearDatabase,
       groupMenuList,
+      isLoading,
       handleSetCopyOrders,
     }),
     [
@@ -39,11 +41,14 @@ export const SubscribeOrdersProvider = ({ children }: PropsWithChildren) => {
       sortMenuList,
       groupMenuList,
       clearDatabase,
+      isLoading,
       handleSetCopyOrders,
     ]
   );
 
   return (
-    <SubscribeOrdersContext value={value}>{children}</SubscribeOrdersContext>
+    <SubscribeOrdersContext.Provider value={value}>
+      {children}
+    </SubscribeOrdersContext.Provider>
   );
 };
