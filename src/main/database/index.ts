@@ -251,17 +251,23 @@ class ReactiveLowDB extends EventEmitter {
     return copyDishes;
   }
 
-  async watchData(callback: () => Promise<void>) {
+  async watchData(callback: () => Promise<void>, initialCall = true) {
     // Добавляем callback в список подписчиков
     this.subscribers.push(callback);
 
-    // Сразу отправляем текущие данные
-    await callback();
+    // Сразу отправляем текущие данные, если требуется
+    if (initialCall) {
+      await callback();
+    }
 
     // Возвращаем функцию отписки
     return () => {
       this.subscribers = this.subscribers.filter((sub) => sub !== callback);
     };
+  }
+
+  async triggerSubscriber(callback: () => Promise<void>) {
+    await callback();
   }
 
   private async notifySubscribers() {

@@ -7,10 +7,23 @@ import type {
   TMenuList,
   FilterDishes,
 } from "../entities/menu-list";
+import {
+  cleanupSubscription,
+  cleanupSubscriptions,
+  triggerInitialData,
+  watchDataHandler,
+} from "./watchDataHandler";
 import { createExcel } from "./createExcel";
-import { cleanupSubscriptions, watchDataHandler } from "./watchDataHandler";
 
 export const handleRegister = () => {
+  ipcMain.on("unsubscribe-channel", (_event, channel) =>
+    cleanupSubscription(channel)
+  );
+
+  ipcMain.on("renderer-ready-for-data", (_event, channel) => {
+    triggerInitialData(channel);
+  });
+
   ipcMain.handle(
     "db-watch-orders",
     async (event, filter: FilterDishes) =>

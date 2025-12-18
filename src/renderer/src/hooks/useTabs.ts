@@ -18,10 +18,20 @@ export const useTabs = () => {
     return () => unsubscribe();
   };
 
-  //@ts-expect-error after
   useEffect(() => {
-    fetchTabs();
-    return () => fetchTabs();
+    let unsubscribe: () => void;
+
+    const fetchAndSubscribe = async () => {
+      unsubscribe = await fetchTabs();
+    };
+
+    fetchAndSubscribe();
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, []);
 
   return {
